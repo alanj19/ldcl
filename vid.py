@@ -158,6 +158,10 @@ while cap.isOpened():
     if not ret:
         break
 
+    # Get the current frame number
+    frame_number = int(cap.get(cv2.CAP_PROP_POS_FRAMES))
+    print(f"Displaying frame: {frame_number}")
+
     height, width, _ = frame.shape 
     canny_image = canny(frame)
     if canny_image is None:
@@ -181,9 +185,15 @@ while cap.isOpened():
     # Convert OpenCV frame to PIL Image
     frame_pil = Image.fromarray(cv2.cvtColor(combo_image, cv2.COLOR_BGR2RGB)).convert("RGBA")
 
+    # Rotate the overlay image conditionally
+    if 2650 <= frame_number <= 2850:
+        rotated_overlay = overlay_rotated.rotate(270, expand=True)  # Rotate again
+    else:
+        rotated_overlay = overlay_rotated  # Keep original rotation
+
     # Position overlay in the top-right corner
     position = (0, 0)  
-    frame_pil.paste(overlay_rotated, position, overlay_rotated)  
+    frame_pil.paste(rotated_overlay, position, rotated_overlay)  
 
     # Convert back to OpenCV format
     frame_bgr = cv2.cvtColor(np.array(frame_pil), cv2.COLOR_RGBA2BGR)
